@@ -21,7 +21,7 @@ router.get('/:userId', async (req, res) => {
     }).lean();
     delete userDetails._id;
     delete userDetails.__v;
-    res.status(200).json(userDetails);
+    res.status(200).json(userDetails[0]);
   } catch (error) {
     res.status(500).json({ message: error });
   }

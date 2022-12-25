@@ -18,6 +18,7 @@ const userSchema = new Schema({
   gender: { type: String, enum: ['male', 'female'] },
   contactNo: Number,
   email: { type: String, require: true },
+  isEmailVerified: Boolean,
   clinicName: { type: String, default: null },
   clinicAddress: { type: String, default: null },
   yearsOfExperience: { type: String, default: null },

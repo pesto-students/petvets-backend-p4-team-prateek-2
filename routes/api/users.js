@@ -6,7 +6,7 @@ const User = require('../../models/users.model');
 router.get('/', async (req, res) => {
   const role = req.query.role;
   try {
-    const users = await User.find({ role: role, status: 'approved' }).lean();
+    const users = await User.find({ role: role }).lean();
     res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ message: error });

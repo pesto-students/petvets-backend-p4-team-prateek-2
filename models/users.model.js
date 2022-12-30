@@ -47,6 +47,8 @@ const userSchema = new Schema({
   startTime: String,
   endTime: String,
   constantDaysOff: [{ type: Number, refs: daysEnum }],
+},{
+  timestamps: true,
 });
 
 const userModel = mongoose.model('User', userSchema);

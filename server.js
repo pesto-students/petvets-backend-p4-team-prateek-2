@@ -8,6 +8,7 @@ const cors = require('cors');
 const userRouter = require('./routes/api/users');
 const availabilityRouter = require('./routes/api/availability');
 const appointmentRouter = require('./routes/api/appointments');
+const adminRouter = require('./routes/api/admin');
 
 const PORT = process.env.PORT;
 
@@ -44,6 +45,7 @@ connection.once('open', () => {
 app.use('/api/users', userRouter);
 app.use('/api/availability', availabilityRouter);
 app.use('/api/appointments', appointmentRouter);
+app.use('/api/admin', adminRouter);
 
 app.listen(PORT, function () {
   console.log('Server is running on Port: ' + PORT);

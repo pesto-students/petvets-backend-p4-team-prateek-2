@@ -5,11 +5,13 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const cors = require('cors');
-
+const { Client } = require('@elastic/elasticsearch');
 
 const userRouter = require('./routes/api/users');
 const appointmentRouter = require('./routes/api/appointments');
 const razorpayRouter = require('./routes/api/payment')
+const dataRouter = require('./server/data_management/retrieve_and_ingest_data');
+const ESRouter = require("./server/elasticsearch/es");
 
 const PORT = process.env.PORT;
 
@@ -23,6 +25,7 @@ app.use(helmet()); // adding Helmet to enhance your Rest API's security
 app.use(bodyParser.json()); // using bodyParser to parse JSON bodies into JS objects
 app.use(cors()); // enabling CORS for all requests
 app.use(morgan('combined')); // adding morgan to log HTTP requests
+
 
 /**
  * Database Configuration
@@ -44,6 +47,11 @@ connection.once("open", ()=>{
 app.use('/api/users', userRouter);
 app.use('/api/appointments', appointmentRouter);
 app.use('/api/payment', razorpayRouter);
+
+
+// Elasticsearch API
+app.use('/ingest_data', dataRouter);
+app.use('/es', ESRouter)
 
 app.listen(PORT, function () {
   console.log('Server is running on Port: ' + PORT);

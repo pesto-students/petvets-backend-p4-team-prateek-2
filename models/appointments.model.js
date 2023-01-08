@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const paymentEnum = new mongoose.Schema({
@@ -19,13 +19,17 @@ const appointmentSchema = new Schema(
     petAge: Number,
     contactNo: Number,
     email: String,
-    paymentStatus: [{ type: String, refs: paymentEnum }]
+    paymentStatus: [{ type: String, refs: paymentEnum }],
+    vetDetail: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: 'User',
+    },
   },
   {
     timestamps: true,
   }
 );
 
-const appointmentModel = mongoose.model("appointment", appointmentSchema);
+const appointmentModel = mongoose.model('appointment', appointmentSchema);
 
 module.exports = appointmentModel;

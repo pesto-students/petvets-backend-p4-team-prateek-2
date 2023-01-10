@@ -50,6 +50,24 @@ router.post('/', async (req, res) => {
   }
 });
 
+router.put('/:userId', async (req, res) => {
+  const body = req.body;
+  const userId = req.params.userId;
+  try {
+    let userDetails = await User.findOne({
+      userId: userId,
+    }).lean();
+    userDetails = {
+      ...userDetails,
+      ...body,
+    };
+    await User.updateOne({ userId: userId }, userDetails);
+    res.status(200).json({ message: 'User updated successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error });
+  }
+});
+
 router.patch('/:userId', async (req, res) => {
   try {
     await User.findOneAndUpdate({ _id: req.params.userId }, { $set: req.body });

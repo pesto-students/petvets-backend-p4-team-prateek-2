@@ -7,16 +7,18 @@ const Appointment = require("../../models/appointments.model");
 
 router.get("/", async (req, res) => {
     const vetId = req.query.vetId;
-    const date = req.query.date.toString();
-    console.log(date)
+    const dateQuery = req.query.date;
 
-    const startTime = moment(date);
-    const endTime = moment(date);
   
-    if (!vetId) {
-      res.status(400).json("require vetId");
+  
+    if (!vetId || !dateQuery) {
+      res.status(400).json("require vetId & date");
       return;
     }
+    const dateString = dateQuery.toString()
+    const startTime = moment(dateString);
+    const endTime = moment(dateString);
+
     try {
       const appointment = await Appointment.find({ vetId: vetId, bookingDate: { $gte: moment(startTime).startOf('day').format('llll'), $lt: moment(endTime).endOf('day').format('llll')} })
       res.status(200).json(appointment);

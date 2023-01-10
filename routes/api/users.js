@@ -4,10 +4,23 @@ const router = express.Router();
 const User = require('../../models/users.model');
 
 router.get('/', async (req, res) => {
-  const role = req.query.role;
+  let role = req.query.role;
+  let category = req.query.category;
   try {
-    const users = await User.find({ role: role }).lean();
-    res.status(200).json(users);
+    if (role && category) {
+      const users = await User.find({
+        role: role,
+        status: 'approved',
+        specialization: category,
+      }).lean();
+      res.status(200).json(users);
+    } else if (role && !category) {
+      const users = await User.find({ role: role, status: 'approved' }).lean();
+      res.status(200).json(users);
+    } else {
+      const users = await User.find({ role: role }).lean();
+      res.status(200).json(users);
+    }
   } catch (error) {
     res.status(500).json({ message: error });
   }
@@ -33,7 +46,6 @@ router.post('/', async (req, res) => {
     await user.save();
     res.status(200).json({ message: 'User created successfully' });
   } catch (error) {
-    console.log(error);
     res.status(400).json({ message: error });
   }
 });

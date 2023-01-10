@@ -1,30 +1,60 @@
-require("dotenv").config();
 const express = require("express");
+const path = require("path");
 const Razorpay = require("razorpay");
-
+const shortid = require("shortid");
+const bodyParser = require("body-parser");
+const crypto = require("crypto");
+const cors = require("cors");
 const router = express.Router();
 
-router.post("/appointments", async (req, res) => {
-    try {
-        const instance = new Razorpay({
-            key_id: process.env.RAZORPAY_KEY_ID,
-            key_secret: process.env.RAZORPAY_SECRET,
-        });
+require("dotenv").config();
 
-        const options = {
-            amount: 50000, // amount in smallest currency unit
-            currency: "INR",
-            receipt: "receipt_order_74394",
-        };
+let razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
 
-        const order = await instance.orders.create(options);
+router.post("/verification", (req, res) => {
+  const secret = "razorpaysecret";
 
-        if (!order) return res.status(500).send("Some error occured");
+  const shasum = crypto.createHmac("sha256", secret);
+  shasum.update(JSON.stringify(req.body));
+  const digest = shasum.digest("hex");
 
-        res.json(order);
-    } catch (error) {
-        res.status(500).send(error);
-    }
+  console.log(digest, req.headers["x-razorpay-signature"]);
+
+  if (digest === req.headers["x-razorpay-signature"]) {
+    console.log("request is legit");
+    res.status(200).json({
+      message: "OK",
+    });
+  } else {
+    res.status(403).json({ message: "Invalid" });
+  }
+});
+
+router.post("/razorpay", async (req, res) => {
+  const payment_capture = 1;
+  const amount = 500;
+  const currency = "INR";
+
+  const options = {
+    amount,
+    currency,
+    receipt: shortid.generate(),
+    payment_capture,
+  };
+
+  try {
+    const response = await razorpay.orders.create(options);
+    res.status(200).json({
+      id: response.id,
+      currency: response.currency,
+      amount: response.amount,
+    });
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 module.exports = router;

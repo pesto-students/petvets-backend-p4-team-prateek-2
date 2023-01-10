@@ -8,48 +8,52 @@ const daysEnum = new mongoose.Schema({
   },
 });
 
-const userSchema = new Schema({
-  userId: { type: String, require: true },
-  role: { type: String, enum: ['user', 'doctor', 'admin'], require: true },
-  firstName: { type: String, require: true },
-  lastName: { type: String, require: true },
-  dob: Date,
-  firebase_auth_data: {},
-  gender: { type: String, enum: ['male', 'female'] },
-  contactNo: Number,
-  email: { type: String, require: true },
-  isEmailVerified: Boolean,
-  clinicName: { type: String, default: null },
-  clinicAddress: { type: String, default: null },
-  yearsOfExperience: { type: String, default: null },
-  clinicContactNo: { type: String, default: null },
-  clinicEmail: { type: String, default: null },
-  license: {
-    data: Buffer,
-    contentType: String,
+const userSchema = new Schema(
+  {
+    userId: { type: String, require: true },
+    role: { type: String, enum: ['user', 'doctor', 'admin'], require: true },
+    firstName: { type: String, require: true },
+    lastName: { type: String, require: true },
+    dob: Number,
+    degree: { type: Array },
+    firebase_auth_data: {},
+    gender: { type: String, enum: ['male', 'female'] },
+    mobile: Number,
+    email: { type: String, require: true },
+    isEmailVerified: Boolean,
+    clinicName: { type: String, default: null },
+    clinicAddress: { type: String, default: null },
+    yearsOfExperience: { type: String, default: null },
+    clinicContactNo: { type: String, default: null },
+    clinicEmail: { type: String, default: null },
+    license: {
+      data: Buffer,
+      contentType: String,
+    },
+    consultationFee: { type: Number, default: 0 },
+    status: {
+      type: String,
+      enum: ['pending', 'approved', 'rejected'],
+      default: 'pending',
+    },
+    specialization: {
+      type: String,
+      enum: ['dog', 'cat', 'bird', 'cattle', 'all'],
+    },
+    services: String,
+    image: {
+      data: Buffer,
+      contentType: String,
+    },
+    about: String,
+    startTime: String,
+    endTime: String,
+    constantDaysOff: [{ type: Number, refs: daysEnum }],
   },
-  consultationFee: { type: Number, default: 0 },
-  status: {
-    type: String,
-    enum: ['pending', 'approved', 'rejected'],
-    default: 'pending',
-  },
-  specialization: {
-    type: String,
-    enum: ['dog', 'cat', 'bird', 'cattle', 'all'],
-  },
-  services: String,
-  image: {
-    data: Buffer,
-    contentType: String,
-  },
-  about: String,
-  startTime: String,
-  endTime: String,
-  constantDaysOff: [{ type: Number, refs: daysEnum }],
-},{
-  timestamps: true,
-});
+  {
+    timestamps: true,
+  }
+);
 
 const userModel = mongoose.model('User', userSchema);
 

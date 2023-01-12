@@ -48,7 +48,7 @@ connection.once("open", ()=>{
 app.use('/api/users', userRouter);
 app.use('/api/appointments', appointmentRouter);
 app.use('/api/appointmentHistory', appointmentHistoryRouter);
-app.use('/api/payment', razorpayRouter);
+app.use('/api/payment', stripeRouter);
 
 
 // Elasticsearch API

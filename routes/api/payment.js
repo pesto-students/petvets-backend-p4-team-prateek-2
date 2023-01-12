@@ -9,52 +9,59 @@ const router = express.Router();
 
 require("dotenv").config();
 
-let razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
+const Appointment = require("../../models/appointments.model");
 
-router.post("/verification", (req, res) => {
-  const secret = "razorpaysecret";
-
-  const shasum = crypto.createHmac("sha256", secret);
-  shasum.update(JSON.stringify(req.body));
-  const digest = shasum.digest("hex");
-
-  console.log(digest, req.headers["x-razorpay-signature"]);
-
-  if (digest === req.headers["x-razorpay-signature"]) {
-    console.log("request is legit");
-    res.status(200).json({
-      message: "OK",
-    });
-  } else {
-    res.status(403).json({ message: "Invalid" });
-  }
-});
-
-router.post("/razorpay", async (req, res) => {
-  const payment_capture = 1;
-  const amount = 500;
-  const currency = "INR";
-
-  const options = {
-    amount,
-    currency,
-    receipt: shortid.generate(),
-    payment_capture,
-  };
-
-  try {
-    const response = await razorpay.orders.create(options);
-    res.status(200).json({
-      id: response.id,
-      currency: response.currency,
-      amount: response.amount,
-    });
-  } catch (err) {
-    console.log(err);
-  }
+router.post('/', (req, res) => {
+  const user = req.user
+  Appointment.save((err, data) => {
+    if (err) {
+      res.status(500).json({ 'msg': 'Database Error Occured!' });
+    } else {
+      // this.paymentTandom(req.user)
+      stripe.customers.create({
+        email: user.email,
+        // source: req.body.stripeToken,
+        name: user.firstName + user.lastName,
+        address: {
+          line1: user.address,
+          postal_code: user.zipCode,
+          city: user.city,
+          state: user.state,
+          country: user.country,
+        }
+      })
+        .then(async (customer) => {
+          const card_token = await stripe.tokens.create({
+            card: {
+              name: user.firstName + user.lastName,
+              number: req.body.cardNumber,
+              exp_month: req.body.cardMonth,
+              exp_year: req.body.cardYear,
+              cvc: req.body.cardCvv
+            }
+          })
+          await stripe.customers.createSource(customer.id, { source: `${card_token.id}` })
+          return stripe.paymentIntents.create({
+            amount: 2500,     // Charging Rs 25
+            description: 'Booked Appointment',
+            currency: 'USD',
+            customer: customer.id
+          });
+        })
+        .then((charge) => {
+          console.log('success')
+          res.status(200).json({ 'status': true, 'msg': 'Success' });  // res.send("Success")  // If no error occurs
+          // res.send("Success")  // If no error occurs
+        })
+        .catch(async (err) => {
+          // delete insurance if payment unsuccessful
+          await Appointment.deleteOne({ _id: data._id });
+          console.log(err)
+          // res.status(500).json({ 'msg': err }); // If some error occurs
+          res.send(err)       // If some error occurs
+        });
+    }
+  });
 });
 
 module.exports = router;

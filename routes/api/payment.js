@@ -1,19 +1,18 @@
 const express = require("express");
-const path = require("path");
-const Razorpay = require("razorpay");
-const shortid = require("shortid");
-const bodyParser = require("body-parser");
-const crypto = require("crypto");
-const cors = require("cors");
 const router = express.Router();
+
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY); 
 
 require("dotenv").config();
 
 const Appointment = require("../../models/appointments.model");
 
 router.post('/', (req, res) => {
-  const user = req.user
-  Appointment.save((err, data) => {
+  console.log(req)
+  const user = req.body.userDetail
+  const doctor = req.body.vetDetail
+  const appointment = new Appointment(req.body);
+  appointment.save((err, data) => {
     if (err) {
       res.status(500).json({ 'msg': 'Database Error Occured!' });
     } else {
@@ -23,7 +22,7 @@ router.post('/', (req, res) => {
         // source: req.body.stripeToken,
         name: user.firstName + user.lastName,
         address: {
-          line1: user.address,
+          line1: "",
           postal_code: user.zipCode,
           city: user.city,
           state: user.state,
@@ -42,23 +41,22 @@ router.post('/', (req, res) => {
           })
           await stripe.customers.createSource(customer.id, { source: `${card_token.id}` })
           return stripe.paymentIntents.create({
-            amount: 2500,     // Charging Rs 25
+            amount: doctor.consultationFee,     // Charging Rs 25
             description: 'Booked Appointment',
-            currency: 'USD',
+            currency: 'INR',
             customer: customer.id
           });
         })
         .then((charge) => {
           console.log('success')
-          res.status(200).json({ 'status': true, 'msg': 'Success' });  // res.send("Success")  // If no error occurs
-          // res.send("Success")  // If no error occurs
+          data.paymentStatus = "succeeded"
+          res.status(200).json({ 'status': true, 'msg': 'Success' });
         })
         .catch(async (err) => {
           // delete insurance if payment unsuccessful
-          await Appointment.deleteOne({ _id: data._id });
-          console.log(err)
-          // res.status(500).json({ 'msg': err }); // If some error occurs
-          res.send(err)       // If some error occurs
+          await appointment.deleteOne({ _id: data._id });
+          console.log("err", err)
+          res.status(500).json({ 'msg': err }); 
         });
     }
   });

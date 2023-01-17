@@ -46,9 +46,8 @@ const userSchema = new Schema(
       enum: ['dog', 'cat', 'bird', 'cattle', 'all'],
     },
     services: String,
-    image: {
-      data: Buffer,
-      contentType: String,
+    profileURL: {
+      type: String,
     },
     about: String,
     startTime: String,

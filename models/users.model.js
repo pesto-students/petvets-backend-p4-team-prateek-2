@@ -29,7 +29,6 @@ const userSchema = new Schema(
     clinicPincode: { type: String, default: null },
     clinicContactNo: { type: String, default: null },
     yearsOfExperience: { type: String, default: null },
-    clinicDaysOff: { type: Array },
     clinicEmail: { type: String, default: null },
     consultationFee: { type: Number, default: 0 },
     license: {
@@ -52,7 +51,7 @@ const userSchema = new Schema(
     about: String,
     startTime: String,
     endTime: String,
-    constantDaysOff: [{ type: Number, refs: daysEnum }],
+    clinicDaysOff: [{ type: Number, refs: daysEnum }],
   },
   {
     timestamps: true,

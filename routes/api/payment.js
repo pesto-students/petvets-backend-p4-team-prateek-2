@@ -53,7 +53,6 @@ router.post('/', (req, res) => {
           res.status(200).json({ 'status': true, 'msg': 'Success' });
         })
         .catch(async (err) => {
-          // delete insurance if payment unsuccessful
           await appointment.deleteOne({ _id: data._id });
           console.log("err", err)
           res.status(500).json({ 'msg': err }); 

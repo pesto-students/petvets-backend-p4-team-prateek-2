@@ -13,6 +13,7 @@ const appointmentHistoryRouter = require('./routes/api/appointmentHistory')
 const StripeRouter = require('./routes/api/payment')
 const dataRouter = require('./server/data_management/retrieve_and_ingest_data');
 const ESRouter = require("./server/elasticsearch/es");
+const blogRouter = require('./routes/api/blogs')
 
 const PORT = process.env.PORT;
 
@@ -49,6 +50,7 @@ app.use('/api/users', userRouter);
 app.use('/api/appointments', appointmentRouter);
 app.use('/api/appointmentHistory', appointmentHistoryRouter);
 app.use('/api/payment', StripeRouter);
+app.use('/api/blogs', blogRouter);
 
 
 // Elasticsearch API

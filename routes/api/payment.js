@@ -16,10 +16,8 @@ router.post('/', (req, res) => {
     if (err) {
       res.status(500).json({ 'msg': 'Database Error Occured!' });
     } else {
-      // this.paymentTandom(req.user)
       stripe.customers.create({
         email: user.email,
-        // source: req.body.stripeToken,
         name: user.firstName + user.lastName,
         address: {
           line1: "",
@@ -41,14 +39,14 @@ router.post('/', (req, res) => {
           })
           await stripe.customers.createSource(customer.id, { source: `${card_token.id}` })
           return stripe.paymentIntents.create({
-            amount: doctor.consultationFee,     // Charging Rs 25
+            amount: doctor.consultationFee, 
             description: 'Booked Appointment',
             currency: 'INR',
             customer: customer.id
           });
         })
         .then((charge) => {
-          console.log('success')
+          console.log('success', charge)
           data.paymentStatus = "succeeded"
           res.status(200).json({ 'status': true, 'msg': 'Success' });
         })

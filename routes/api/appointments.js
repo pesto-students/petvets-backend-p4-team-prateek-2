@@ -8,8 +8,6 @@ const Appointment = require("../../models/appointments.model");
 router.get("/", async (req, res) => {
     const vetId = req.query.vetId;
     const dateQuery = req.query.date;
-
-  
   
     if (!vetId || !dateQuery) {
       res.status(400).json("require vetId & date");

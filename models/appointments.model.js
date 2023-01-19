@@ -16,8 +16,8 @@ const appointmentSchema = new Schema(
     bookingDate: Date,
     userName: String,
     petName: String,
-    petAge: Number,
-    contactNo: Number,
+    petAge: String,
+    contactNo: String,
     email: String,
     paymentStatus: [{ type: String, refs: paymentEnum }]
   },
@@ -26,6 +26,6 @@ const appointmentSchema = new Schema(
   }
 );
 
-const appointmentModel = mongoose.model("appointment", appointmentSchema);
+const appointmentModel = mongoose.model('appointment', appointmentSchema);
 
 module.exports = appointmentModel;

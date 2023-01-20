@@ -1,10 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const sgMail = require('@sendgrid/mail');
+const User = require('../../models/users.model');
 
 router.post('/sendEmail', async (req, res) => {
   const { status, userData } = req.body;
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+  const userId = userData.userId;
 
   const msg = {
     to: userData.email, // Change to your recipient
@@ -16,8 +18,14 @@ router.post('/sendEmail', async (req, res) => {
 
   try {
     const response = await sgMail.send(msg);
-    console.log(response[0].statusCode);
-    console.log(response[0].headers);
+    let userDetails = await User.findOne({
+      userId: userId,
+    }).lean();
+    userDetails = {
+      ...userDetails,
+      status: status,
+    };
+    await User.updateOne({ userId: userId }, userDetails);
     res.status(response[0].statusCode).json();
   } catch (error) {
     console.error(error);

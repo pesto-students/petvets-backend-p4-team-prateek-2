@@ -17,7 +17,7 @@ const userSchema = new Schema(
     dob: Number,
     degree: { type: Array },
     firebase_auth_data: {},
-    gender: { type: String, enum: ['male', 'female'] },
+    gender: { type: String, enum: ['Male', 'Female'] },
     mobile: Number,
     email: { type: String, require: true },
     isEmailVerified: Boolean,

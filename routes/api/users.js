@@ -26,6 +26,16 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/userrole', async (req, res) => {
+  let role = req.query.role;
+  try {
+    const users = await User.find({ role: role }).lean();
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: error });
+  }
+});
+
 router.get('/:userId', async (req, res) => {
   const userId = req.params.userId;
   try {
